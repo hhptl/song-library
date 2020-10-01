@@ -16,6 +16,7 @@ import app.Song;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -153,6 +154,11 @@ public class ListController {
 		Song newSong = new Song(SongName.getText(), ArtistName.getText(), AlbumName.getText(), YearEdit.getText());
 		if (sortOnInsertion(newSong) == 0) {
 			//there was a duplicate
+			Alert dupAlert = new Alert(Alert.AlertType.INFORMATION);
+			dupAlert.setTitle("Warning");
+			dupAlert.setHeaderText("Input");
+			dupAlert.setContentText("Duplicate Song");
+			dupAlert.showAndWait();
 		}
 		
 		//source: https://stackoverflow.com/questions/50296723/setcellfactory-override-updateitem-and-wrap-text
@@ -194,6 +200,7 @@ public class ListController {
 	@FXML
 	private void edit(){
 		
+		
 	}
 	
 	//use this method instead of just the sort method of FX collections because we use album title to sort in case of ties
@@ -202,7 +209,7 @@ public class ListController {
 	private int sortOnInsertion(Song x) {
 		if (songList.size() == 0) {
 			songList.add(x);
-			return 0;
+			return 1;
 		}
 		
 		for(int i = 0; i<songList.size(); i++) {
