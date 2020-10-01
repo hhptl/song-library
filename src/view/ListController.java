@@ -16,6 +16,7 @@ import app.Song;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -35,6 +36,8 @@ public class ListController {
 	//TextFields named after the items from the fxml
 	//show on bottom of the screen of the interfaceGUI
 	@FXML TextField SongName, ArtistName, AlbumName, YearEdit;
+	
+	@FXML Button deleteBtn, editBtn;
 	
 	//list of the song objects using javaFX collections API
 	@FXML private ObservableList<Song> songList = FXCollections.observableArrayList();              
@@ -178,6 +181,13 @@ public class ListController {
 		save();
 		System.out.println("test");
 		
+		//clear the text fields
+		
+		SongName.clear();
+		YearEdit.clear();
+		ArtistName.clear();
+		AlbumName.clear();
+		
 	}
 	
 	
@@ -224,7 +234,53 @@ public class ListController {
 	
 	@FXML
 	private void delete() {
-		Song selected = listView.getSelectionModel().getSelectedItem();
+		Song currentSelection = listView.getSelectionModel().getSelectedItem();
+		int indexDeleted = listView.getSelectionModel().getSelectedIndex();
+		
+		if(currentSelection == null) {
+			return;
+		}
+		
+		//songList.remove(currentSelection);
+	//	save();
+		
+		//select next song in list if there is one
+		if(indexDeleted != songList.size()-1 && songList.size()!=1) {
+			listView.getSelectionModel().selectNext();
+			Song newSelection = listView.getSelectionModel().getSelectedItem();
+			String outPut = "Song:     " + newSelection.getName() + "\n          " + "Artist:     " +  newSelection.getArtist() + "\n          " +
+					"Album:     " + newSelection.getAlbum() +"\n          " +"Year:     " + newSelection.getYear();
+					
+				screener.setText(outPut);	
+				songList.remove(currentSelection);
+				save();
+				System.out.println("we testing");
+			}
+		
+		//if there is no next song, select the previous song
+		else if (indexDeleted == songList.size()-1 && songList.size()!= 1) {
+			listView.getSelectionModel().selectPrevious();
+			
+			Song newSelection = listView.getSelectionModel().getSelectedItem();
+			String outPut = "Song:     " + newSelection.getName() + "\n          " + "Artist:     " +  newSelection.getArtist() + "\n          " +
+					"Album:     " + newSelection.getAlbum() +"\n          " +"Year:     " + newSelection.getYear();
+					
+				screener.setText(outPut);
+				
+				songList.remove(currentSelection);
+				save();
+		}
+		//if list is empty, then empty the details shown
+		else if(songList.size() == 1) {
+			songList.remove(currentSelection);
+			save();
+			String outPut = "No Songs";
+			screener.setText(outPut);
+			//deleteBtn.setDisable(true);
+			//editBtn.setDisable(true);
+			
+		}
+
 	}
 	
 	public void save() {
@@ -254,8 +310,6 @@ public class ListController {
 		catch ( IOException e)
 		{
 		}
-		finally
-		{
 			try
 			{
 				if ( writer != null)
@@ -264,7 +318,7 @@ public class ListController {
 			catch ( IOException e)
 			{
 			}
-		}
+	
 	}
 
 
