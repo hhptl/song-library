@@ -41,8 +41,8 @@ public class ListController {
 	@FXML Button deleteBtn, editBtn;
 	
 	//list of the song objects using javaFX collections API
-	@FXML private ObservableList<Song> songList = FXCollections.observableArrayList();              
-
+	@FXML private ObservableList<Song> songList = FXCollections.observableArrayList();      
+	
 	public void start(Stage mainStage) {    
 		//handle the file stuff 
 		File f = new File("songs.txt");
@@ -53,7 +53,7 @@ public class ListController {
 				}
 				
 				catch(IOException e){
-					e.printStackTrace();
+					System.out.println("error :(");
 				}
 				
 			}
@@ -66,16 +66,16 @@ public class ListController {
 		
 		try {
 			br = new BufferedReader(new FileReader(txtFile));
-			while ((line = br.readLine()) != null) {	//for each song in the song list txt,
+			while ((line = br.readLine()) != null) {	
 				String[] songDetails = new String[4];
-				String[] temp = line.split(cvsSplitBy);	//create array of song details, separated by ","
+				String[] temp = line.split(cvsSplitBy);	
 
 				for(int i = 0; i < temp.length; i++) {
 					songDetails[i] = temp[i];
 				}
 
 				Song song = new Song(songDetails[0], songDetails[1], songDetails[2], songDetails[3]);
-    			songList.add(song);	//add song array entry 0 (song title) to songs list
+    			songList.add(song);	
     		}
 			
 			//source: https://stackoverflow.com/questions/50296723/setcellfactory-override-updateitem-and-wrap-text
@@ -118,10 +118,7 @@ public class ListController {
 			screener.setText("Nothing Selected");
 		}
 		else {
-			String outPut = "Song:     " + songS.getName() + "\n          " + "Artist:     " +  songS.getArtist() + "\n          " +
-					"Album:     " + songS.getAlbum() +"\n          " +"Year:     " + songS.getYear();
-					
-			screener.setText(outPut);
+			textSetter(songS);
 			
 			System.out.println(songS.getName());
 		}
@@ -131,12 +128,15 @@ public class ListController {
 	//fields song and artist are the minimum info needed to be filled in 
 	private boolean badInput() {
 		
-		String name = SongName.getText();
-		
 		if(SongName.getText().isEmpty() || ArtistName.getText().isEmpty()) {
 			
 			System.out.println("Bad Input: try again human");
 			//give an alert to the user as well?
+			Alert dupAlert = new Alert(Alert.AlertType.INFORMATION);
+			dupAlert.setTitle("Warning");
+			dupAlert.setHeaderText("Input");
+			dupAlert.setContentText("Song and Artist are required Fields");
+			dupAlert.showAndWait();
 			
 			return true;
 		}
@@ -180,27 +180,74 @@ public class ListController {
 		
 				
 	listView.getSelectionModel().select(newSong);
-	String outPut = "Song:     " + newSong.getName() + "\n          " + "Artist:     " +  newSong.getArtist() + "\n          " +
-			"Album:     " + newSong.getAlbum() +"\n          " +"Year:     " + newSong.getYear();
-			
-		screener.setText(outPut);	
+	textSetter(newSong);	
 		save();
 		System.out.println("test");
 		
 		//clear the text fields
-		
+		cancel();
+	}
+	
+	@FXML
+	private void cancel() {
 		SongName.clear();
 		YearEdit.clear();
 		ArtistName.clear();
 		AlbumName.clear();
-		
 	}
-	
 	
 	@FXML
 	private void edit(){
+		if(badInput()) return;
 		
+		Song currentSelection = listView.getSelectionModel().getSelectedItem();
+		Song newSong = new Song(SongName.getText(), ArtistName.getText(), AlbumName.getText(), YearEdit.getText());
 		
+		//check the case in which songName or artistName changes
+		if(!SongName.getText().equalsIgnoreCase(currentSelection.getName()) 
+		|| !ArtistName.getText().equalsIgnoreCase(currentSelection.getArtist())) {
+			//in this case, we have to check for duplicates 
+
+			if(sortOnInsertion(newSong) == 0) {
+				//duplicates exist
+				Alert dupAlert = new Alert(Alert.AlertType.INFORMATION);
+				dupAlert.setTitle("Warning");
+				dupAlert.setHeaderText("Input");
+				dupAlert.setContentText("Duplicate Song");
+				dupAlert.showAndWait();
+				
+			}
+			else {
+				//song was inserted
+				delete();
+				listView.getSelectionModel().select(newSong);
+				//source: https://stackoverflow.com/questions/50296723/setcellfactory-override-updateitem-and-wrap-text
+				listView.setItems(songList);
+				listView.setCellFactory((list) -> {
+					return new ListCell<Song>() {
+						protected void updateItem(Song item, boolean empty) {
+							super.updateItem(item, empty);
+
+							if (item == null || empty) {
+								setText(null);
+							} else {
+								setText(item.getName() + ", by " + item.getArtist());
+							}
+						}
+					};
+				});
+				
+			}
+			
+		}
+		else {
+			//case in which the songName and artistName do not change
+			//in this case we do not have to check for duplicates
+			delete(); addS();
+			listView.getSelectionModel().select(newSong);
+		}
+		cancel();
+		save();
 	}
 	
 	//use this method instead of just the sort method of FX collections because we use album title to sort in case of ties
@@ -248,20 +295,14 @@ public class ListController {
 			return;
 		}
 		
-		//songList.remove(currentSelection);
-	//	save();
-		
 		//select next song in list if there is one
 		if(indexDeleted != songList.size()-1 && songList.size()!=1) {
 			listView.getSelectionModel().selectNext();
 			Song newSelection = listView.getSelectionModel().getSelectedItem();
-			String outPut = "Song:     " + newSelection.getName() + "\n          " + "Artist:     " +  newSelection.getArtist() + "\n          " +
-					"Album:     " + newSelection.getAlbum() +"\n          " +"Year:     " + newSelection.getYear();
-					
-				screener.setText(outPut);	
+			textSetter(newSelection);	
 				songList.remove(currentSelection);
 				save();
-				System.out.println("we testing");
+				System.out.println("testing");
 			}
 		
 		//if there is no next song, select the previous song
@@ -269,10 +310,7 @@ public class ListController {
 			listView.getSelectionModel().selectPrevious();
 			
 			Song newSelection = listView.getSelectionModel().getSelectedItem();
-			String outPut = "Song:     " + newSelection.getName() + "\n          " + "Artist:     " +  newSelection.getArtist() + "\n          " +
-					"Album:     " + newSelection.getAlbum() +"\n          " +"Year:     " + newSelection.getYear();
-					
-				screener.setText(outPut);
+			textSetter(newSelection);
 				
 				songList.remove(currentSelection);
 				save();
@@ -283,8 +321,7 @@ public class ListController {
 			save();
 			String outPut = "No Songs";
 			screener.setText(outPut);
-			//deleteBtn.setDisable(true);
-			//editBtn.setDisable(true);
+
 			
 		}
 
@@ -328,5 +365,26 @@ public class ListController {
 	
 	}
 
-
+	//Show the stuff on the interface
+	public void textSetter(Song y) {
+		String name="", artist="", album= "", year = "";
+		if (y.getName()!=null) {
+			name = y.getName();
+		}
+		if(y.getArtist()!=null) {
+			artist = y.getArtist();
+		}
+		if(y.getAlbum()!=null) {
+			album = y.getAlbum();
+		}
+		if(y.getYear()!=null) {
+			year = y.getYear();
+		}
+		
+		String output = "Song:     " + name + "          " + "Artist:     " +  artist + "\n          " +
+				"Album:     " + album + "          " +"Year:     " + year;
+		
+			screener.setText(output);;
+		
+	}
 }
