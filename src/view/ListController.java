@@ -6,6 +6,10 @@
 package view;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import app.Song;
@@ -17,6 +21,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+
 
 
 public class ListController {
@@ -36,20 +41,65 @@ public class ListController {
 
 	public void start(Stage mainStage) {    
 		//handle the file stuff 
-		BufferedReader br = null;
+		File f = new File("songs.csv");
 		
-		//try {
-			//BufferedReader csvReader = new BufferedReader(new FileReader(pathToCsv));
+			if(!f.exists()) {
+				try {
+					f.createNewFile();
+				}
+				
+				catch(IOException e){
+					e.printStackTrace();
+				}
+				
+			}
+		
+			
+		String csvFile = "songs.csv";
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+		
+		try {
+			br = new BufferedReader(new FileReader(csvFile));
+			while ((line = br.readLine()) != null) {	//for each song in the song list csv,
+				String[] songDetails = new String[4];
+				String[] temp = line.split(cvsSplitBy);	//create array of song details, separated by ","
+
+				for(int i = 0; i < temp.length; i++) {
+					songDetails[i] = temp[i];
+				}
+
+				Song song = new Song(songDetails[0], songDetails[1], songDetails[2], songDetails[3]);
+    			songList.add(song);	//add song array entry 0 (song title) to songs list
+    		}
+			
+			//source: https://stackoverflow.com/questions/50296723/setcellfactory-override-updateitem-and-wrap-text
+			listView.setItems(songList);
+			listView.setCellFactory((list) -> {
+				return new ListCell<Song>() {
+					protected void updateItem(Song item, boolean empty) {
+						super.updateItem(item, empty);
+
+						if (item == null || empty) {
+							setText(null);
+						} else {
+							setText(item.getName() + ", by " + item.getArtist());
+						}
+					}
+				};
+			});
+			
 			
 		
-		//}
+		}
 		
-		//catch(IOException e) {
-			//System.out.println("Error with file");
+		catch(IOException e) {
+			System.out.println("Error with file");
 			
 		}
 		
-	//}
+	}
 	
 	
 	//display the details on the right side of the screen
@@ -125,6 +175,7 @@ public class ListController {
 			"Album:     " + newSong.getAlbum() +"\n          " +"Year:     " + newSong.getYear();
 			
 		screener.setText(outPut);	
+		save();
 		System.out.println("test");
 		
 	}
@@ -176,7 +227,45 @@ public class ListController {
 		Song selected = listView.getSelectionModel().getSelectedItem();
 	}
 	
-	
+	public void save() {
+		String csvFile = "songs.csv";
+		BufferedWriter writer = null;
+		try
+		{
+			writer = new BufferedWriter(new FileWriter(csvFile));
+
+
+			for(int i = 0; i < songList.size(); i++) {
+				Song song = songList.get(i);
+				String album = song.getAlbum();
+				String year = song.getYear();
+
+				if(album == null) {
+					album = "";
+				}
+
+				if(year == null) {
+					year = "";
+				}
+
+				writer.write(song.getName() + "," + song.getArtist() + "," + album + "," + year + "\n" );
+			}
+		}
+		catch ( IOException e)
+		{
+		}
+		finally
+		{
+			try
+			{
+				if ( writer != null)
+					writer.close( );
+			}
+			catch ( IOException e)
+			{
+			}
+		}
+	}
 
 
 }
