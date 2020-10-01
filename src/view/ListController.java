@@ -41,7 +41,7 @@ public class ListController {
 
 	public void start(Stage mainStage) {    
 		//handle the file stuff 
-		File f = new File("songs.csv");
+		File f = new File("songs.txt");
 		
 			if(!f.exists()) {
 				try {
@@ -55,14 +55,14 @@ public class ListController {
 			}
 		
 			
-		String csvFile = "songs.csv";
+		String txtFile = "songs.txt";
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
 		
 		try {
-			br = new BufferedReader(new FileReader(csvFile));
-			while ((line = br.readLine()) != null) {	//for each song in the song list csv,
+			br = new BufferedReader(new FileReader(txtFile));
+			while ((line = br.readLine()) != null) {	//for each song in the song list txt,
 				String[] songDetails = new String[4];
 				String[] temp = line.split(cvsSplitBy);	//create array of song details, separated by ","
 
@@ -228,11 +228,11 @@ public class ListController {
 	}
 	
 	public void save() {
-		String csvFile = "songs.csv";
+		String txtFile = "songs.txt";
 		BufferedWriter writer = null;
 		try
 		{
-			writer = new BufferedWriter(new FileWriter(csvFile));
+			writer = new BufferedWriter(new FileWriter(txtFile));
 
 
 			for(int i = 0; i < songList.size(); i++) {
