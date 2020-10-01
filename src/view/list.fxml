@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.ListController">
+   <left>
+      <ListView fx:id="listView" onMouseClicked="#displaySelection" prefHeight="399.0" prefWidth="235.0" BorderPane.alignment="CENTER" />
+   </left>
+   <bottom>
+      <HBox prefHeight="60.0" prefWidth="596.0" BorderPane.alignment="CENTER" >
+         <children>
+            <Button id="addBtn" mnemonicParsing="false" onAction="#addS" prefHeight="60.0" prefWidth="78.0" text="Add" />
+            <Button id="editBtn" mnemonicParsing="false" onAction="#edit" prefHeight="60.0" prefWidth="85.0" text="Edit" />
+            <Button id="deleteBtn" mnemonicParsing="false" onAction="#delete" prefHeight="60.0" prefWidth="78.0" text="Delete" />
+            <TextField fx:id="SongName" prefHeight="60.0" prefWidth="94.0" promptText="Song Name" />
+            <TextField fx:id="ArtistName" prefHeight="61.0" prefWidth="99.0" promptText="Artist" />
+            <TextField fx:id="AlbumName" prefHeight="64.0" prefWidth="110.0" promptText="Album" />
+            <TextField fx:id="YearEdit" prefHeight="70.0" prefWidth="104.0" promptText="Year" />
+         </children>
+      </HBox>
+   </bottom>
+   <center>
+      <TextField fx:id="screener" editable="false" prefHeight="370.0" prefWidth="334.0" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>
