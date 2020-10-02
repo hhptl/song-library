@@ -20,6 +20,7 @@
             <TextField fx:id="ArtistName" prefHeight="61.0" prefWidth="99.0" promptText="Artist" />
             <TextField fx:id="AlbumName" prefHeight="64.0" prefWidth="110.0" promptText="Album" />
             <TextField fx:id="YearEdit" prefHeight="70.0" prefWidth="104.0" promptText="Year" />
+            <Button id="cancelBtn" mnemonicParsing="false" onAction="#cancel" prefHeight="60.0" prefWidth="200" text="Cancel (Clear Fields)" />
          </children>
       </HBox>
    </bottom>
