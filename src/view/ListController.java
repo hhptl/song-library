@@ -113,17 +113,18 @@ public class ListController {
 		
 		Song songS= listView.getSelectionModel().getSelectedItem();
 		
-		SongName.setText(songS.getName());
-		ArtistName.setText(songS.getArtist());
-		AlbumName.setText(songS.getAlbum());
-		YearEdit.setText(songS.getYear());
+
 		if(songS == null) {
 			
 			screener.setText("Nothing Selected");
 		}
 		else {
-			textSetter(songS);
+			SongName.setText(songS.getName());
+			ArtistName.setText(songS.getArtist());
+			AlbumName.setText(songS.getAlbum());
+			YearEdit.setText(songS.getYear());
 			
+			textSetter(songS);
 			System.out.println(songS.getName());
 		}
 	
